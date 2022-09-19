@@ -1,16 +1,46 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { BookContext } from "../App";
 
 const Cart = () => {
+  const context = useContext(BookContext);
+
+  const totalCartAmount = context.state.cart
+    .reduce((total, book) => total + book.price * book.count, 0)
+    .toFixed(2);
+
+  const totalCartCount = context.state.cart.reduce(
+    (total, book) => (total = total + book.count),
+    0
+  );
+
   return (
     <div>
       <h2>
-        <Link to="/">Kitap Listesi</Link> <span>Sepetim</span>
+        <Link to="/">Kitap Listesi</Link> <span>Sepetim ({totalCartCount})</span>
       </h2>
 
-      <h3>Toplam Sepet Tutarı: &#8378;19.99</h3>
+      <h3>Toplam Sepet Tutarı: &#8378; {totalCartAmount}</h3>
 
-      <div className="book">
+      {context.state.cart.map((book, key) => (
+        <div className="book" key={book.id}>
+          <img src={book.image} alt={book.name} />
+          <div>
+            <h4>{book.name}</h4>
+            <p>Yazar: {book.author}</p>
+            <p>Fiyat: &#8378;{book.price}</p>
+            <p>Toplam: &#8378;{(book.price * book.count).toFixed(2)}</p>
+            <p>Sepetinizde bu kitaptan toplam {book.count} adet var.</p>
+            <button onClick={() => context.decrement(book.id)}>-</button>
+            <button onClick={() => context.removeFromCart(book.id)}>
+              Sepetten Çıkar
+            </button>
+            <button onClick={() => context.increment(book.id)}>+</button>
+          </div>
+        </div>
+      ))}
+
+      {/* <div className="book">
         <img
           src="https://images-na.ssl-images-amazon.com/images/I/51eqjXwFzwL._SX344_BO1,204,203,200_.jpg"
           alt="Simyacı"
@@ -25,7 +55,7 @@ const Cart = () => {
           <button>Sepetten Çıkar</button>
           <button>+</button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
